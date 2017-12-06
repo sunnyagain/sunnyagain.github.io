@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- <script src="https://simplewebrtc.com/latest-v2.js"></script>  -->
+	<script src="http://cdn.peerjs.com/0.3/peer.js"></script>
+</head>
+<body>
+	<audio height="300" id="audio"></audio>
+	<div id="remoteAudios"></div>
+</body>
+<script type="text/javascript">
+	var peerId = window.location.hash;
+	var peer = new Peer(peerId, {key: '317sobcwxq0ejyvi'});
+	var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+	getUserMedia({video: false, audio: true}, function(stream) {
+	  var call = peer.call(peerId, stream);
+	  call.on('stream', function(remoteStream) {
+	    // Show stream in some video/canvas element.
+	  });
+	}, function(err) {
+	  console.log('Failed to get local stream' ,err);
+	});
+
+	peer.on('call', function(call) {
+	  getUserMedia({video: false, audio: true}, function(stream) {
+	    call.answer(stream); // Answer the call with an A/V stream.
+	    call.on('stream', function(remoteStream) {
+	      // Show stream in some video/canvas element.
+	    });
+	  }, function(err) {
+	    console.log('Failed to get local stream' ,err);
+	  });
+	});
+</script>
+</html>
