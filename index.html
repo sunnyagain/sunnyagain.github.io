@@ -62,16 +62,28 @@
             });
         }
     });
+    function join() {
+    	webrtc.joinRoom(room, function (err, res) {
+            if (err) return;
+            window.setTimeout(function () {
+            	console.debug('index-br.html:59', 'Obj');
+            }, 1000);
+        });
+    }
     webrtc.startLocalVideo();
-    webrtc.createRoom(room, function (err, name) {
-        if (!err) {
-            console.debug('index-br.html:68', 'Obj');
-        } else {
-            console.log('error', err, room);
-            if (err === 'taken') {
-            	console.debug('index-br.html:71', 'Obj');
-            }
-        }
-    });
+    function create() {
+	    webrtc.createRoom(room, function (err, name) {
+	        if (!err) {
+	            console.debug('index-br.html:68', 'Obj');
+	        } else {
+	            console.log('error', err, room);
+	            if (err === 'taken') {
+	            	console.debug('index-br.html:71', 'Obj');
+	            }
+	        }
+	    });
+    }
+    document.querySelector('.button-join').onclick = join();
+    document.querySelector('.button-create').onclick = create();
     </script>
 </html>
