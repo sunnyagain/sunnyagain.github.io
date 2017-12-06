@@ -1,35 +1,77 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<!-- <script src="https://simplewebrtc.com/latest-v2.js"></script>  -->
-	<script src="/peer.min.js"></script>
-</head>
-<body>
-	<audio height="300" id="audio"></audio>
-	<div id="remoteAudios"></div>
-</body>
-<script type="text/javascript">
-	var peerId = window.location.hash;
-	var peer = new Peer(peerId, {key: '317sobcwxq0ejyvi'});
-	var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-	getUserMedia({video: false, audio: true}, function(stream) {
-	  var call = peer.call(peerId, stream);
-	  call.on('stream', function(remoteStream) {
-	    // Show stream in some video/canvas element.
-	  });
-	}, function(err) {
-	  console.log('Failed to get local stream' ,err);
-	});
+    <head>
+        <script src="https://simplewebrtc.com/latest-v2.js"></script>
+        <style>
+            #remoteVideos video {
+                height: 150px;
+            }
+            #localVideo {
+                height: 150px;
+            }
+        </style>
+    </head>
+    <body>
+        <audio id="localAudio" controls oncontextmenu="return false;" disabled></audio>
+        <a class="button button-small button-mute">Mute</a>
+    </body>
+    <script>
+    var room = 'sunnyagain';
+	webrtc = new SimpleWebRTC({
+        // we don't do video
+        localVideoEl: '',
+        remoteVideosEl: '',
+        autoRequestMedia: false,
+        enableDataChannels: false,
+        media: {
+            audio: true,
+            video: false
+        },
+        receiveMedia: { // FIXME: remove old chrome <= 37 constraints format
+            offerToReceiveAudio: 1,
+            offerToReceiveVideo: 0
+        },
+    });
+    webrtc.on('localStream', function(stream) {
+        var localAudio = document.getElementById('localAudio');
+        localAudio.disabled = false;
+        localAudio.volume = 0;
+        //localAudio.srcObject = stream; 
+        if (hasCameras) {
+            document.querySelector('.local-controls').style.visibility = 'visible';
+        }
 
-	peer.on('call', function(call) {
-	  getUserMedia({video: false, audio: true}, function(stream) {
-	    call.answer(stream); // Answer the call with an A/V stream.
-	    call.on('stream', function(remoteStream) {
-	      // Show stream in some video/canvas element.
-	    });
-	  }, function(err) {
-	    console.log('Failed to get local stream' ,err);
-	  });
-	});
-</script>
+        var track = stream.getAudioTracks()[0];
+        var btn = document.querySelector('.button-mute');
+        btn.style.visibility = 'visible';
+        btn.onclick = function() {
+        	console.debug('index-br.html:48', 'Obj');
+            track.enabled = !track.enabled;
+            btn.className = 'button button-small button-mute' + (track.enabled ? '' : ' muted');
+        };
+    });
+
+    webrtc.on('readyToCall', function () {
+    	console.debug('index-br.html:55', 'Obj');
+        if (room) {
+            webrtc.joinRoom(room, function (err, res) {
+                if (err) return;
+                window.setTimeout(function () {
+                	console.debug('index-br.html:59', 'Obj');
+                }, 1000);
+            });
+        }
+    });
+    webrtc.startLocalVideo();
+    webrtc.createRoom(room, function (err, name) {
+        if (!err) {
+            console.debug('index-br.html:68', 'Obj');
+        } else {
+            console.log('error', err, room);
+            if (err === 'taken') {
+            	console.debug('index-br.html:71', 'Obj');
+            }
+        }
+    });
+    </script>
 </html>
