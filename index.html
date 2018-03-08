@@ -23,7 +23,7 @@
         // we don't do video
         localVideoEl: '',
         remoteVideosEl: '',
-        autoRequestMedia: false,
+        autoRequestMedia: true,
         enableDataChannels: false,
         media: {
             audio: true,
@@ -72,7 +72,7 @@
             }, 1000);
         });
     }
-    webrtc.startLocalAudio();
+    webrtc.startLocalVideo();
     function create() {
 	    webrtc.createRoom(room, function (err, name) {
 	        if (!err) {
